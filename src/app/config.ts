@@ -10,7 +10,9 @@ export const error = debug("nodets:[error]");
 export const database = debug("nodets:[database]");
 export const input = debug("nodets:[input]");
 
-export const { port, origin, NODE_ENV } = process.env;
+export const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+export const origin = process.env.origin;
+export const NODE_ENV = process.env.NODE_ENV;
 
 // Configuración de CORS para desarrollo y producción
 const getCorsOrigins = () => {
