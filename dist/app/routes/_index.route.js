@@ -10,7 +10,7 @@ const patch_route_1 = __importDefault(require("./patch.route"));
 const put_route_1 = __importDefault(require("./put.route"));
 const delete_route_1 = __importDefault(require("./delete.route"));
 const auth_routes_1 = __importDefault(require("../../routes/auth.routes"));
-const router = (0, express_1.default)();
+const router = express_1.default.Router();
 router.use('/post', post_route_1.default);
 router.use('/get', get_route_1.default);
 router.use('/patch', patch_route_1.default);

@@ -5,19 +5,23 @@ import { connectDB } from "./app/config/database/connection";
 import authRoutes from "./routes/auth.routes";
 import sessionRoutes from "./routes/session.routes";
 import achievementRoutes from "./routes/achievement.routes";
-import { setupSwagger } from "./swagger/swagger"; // <--- Agrega esta línea
 
-// Conectar a la base de datos
-connectDB();
+console.log("[DEBUG] Iniciando conexión a la base de datos...");
+connectDB()
+  .then(() => {
+    console.log("[DEBUG] Conexión a la base de datos exitosa.");
+    // Rutas
+    app.use("/api/auth", authRoutes);
+    app.use("/api/sessions", sessionRoutes);
+    app.use("/api/achievements", achievementRoutes);
+    console.log("[DEBUG] Rutas configuradas.");
 
-// Swagger docs
-setupSwagger(app); // <--- Agrega esta línea
-
-// Rutas
-app.use("/api/auth", authRoutes);
-app.use("/api/sessions", sessionRoutes);
-app.use("/api/achievements", achievementRoutes);
-
-app.listen(port, () => {
-  server("running in port", port);
-});
+    console.log(`[DEBUG] Iniciando servidor en puerto: ${port}`);
+    app.listen(port, () => {
+      server("running in port", port);
+      console.log(`[DEBUG] Servidor escuchando en puerto: ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("[ERROR] Error al conectar a la base de datos:", err);
+  });

@@ -35,9 +35,8 @@ var __importStar = (this && this.__importStar) || (function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.upload = exports.urlencodeconfig = exports.jsonConfig = exports.corsconfig = exports.origin = exports.port = exports.input = exports.database = exports.error = exports.server = void 0;
+exports.upload = exports.urlencodeconfig = exports.jsonConfig = exports.corsconfig = exports.NODE_ENV = exports.origin = exports.port = exports.input = exports.database = exports.error = exports.server = void 0;
 const debug_1 = __importDefault(require("debug"));
 const dotenv_1 = require("dotenv");
 const multer_1 = __importStar(require("multer"));
@@ -46,11 +45,71 @@ exports.server = (0, debug_1.default)("nodets:[server]");
 exports.error = (0, debug_1.default)("nodets:[error]");
 exports.database = (0, debug_1.default)("nodets:[database]");
 exports.input = (0, debug_1.default)("nodets:[input]");
-_a = process.env, exports.port = _a.port, exports.origin = _a.origin;
+exports.port = process.env.PORT ? Number(process.env.PORT) : 3000;
+exports.origin = process.env.origin;
+exports.NODE_ENV = process.env.NODE_ENV;
+// Configuración de CORS para desarrollo y producción
+const getCorsOrigins = () => {
+    // Por ahora, permitir todos los orígenes
+    return ['*'];
+    // TODO: Configurar orígenes específicos más adelante
+    // Si hay una variable de entorno específica para CORS, usarla
+    // if (origin) {
+    //     const origins = origin.split(',').map(origin => origin.trim());
+    //     // En desarrollo, asegurar que localhost:5173 esté incluido
+    //     if (NODE_ENV === 'development' && !origins.includes('http://localhost:5173')) {
+    //         origins.push('http://localhost:5173');
+    //     }
+    //     return origins;
+    // }
+    // // En desarrollo, permitir localhost
+    // if (NODE_ENV === 'development') {
+    //     return [
+    //         'http://localhost:3000',
+    //         'http://localhost:3001', 
+    //         'http://localhost:5173', // Vite default
+    //         'http://localhost:8080', // Vue CLI default
+    //         'http://127.0.0.1:3000',
+    //         'http://127.0.0.1:3001',
+    //         'http://127.0.0.1:5173',
+    //         'http://127.0.0.1:8080'
+    //     ];
+    // }
+    // // En producción, permitir cualquier origen (o configurar específicos)
+    // // Puedes cambiar esto por dominios específicos si quieres más seguridad
+    // return ['*'];
+};
 exports.corsconfig = {
-    origin: exports.origin || "*",
+    origin: function (origin, callback) {
+        // Permitir requests sin origin (como aplicaciones móviles o Postman)
+        if (!origin)
+            return callback(null, true);
+        const allowedOrigins = getCorsOrigins();
+        // Si está configurado para permitir todos los orígenes
+        if (allowedOrigins.includes('*')) {
+            return callback(null, true);
+        }
+        // Verificar si el origen está permitido
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        }
+        else {
+            console.log('CORS blocked origin:', origin);
+            console.log('Allowed origins:', allowedOrigins);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"]
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+        'Origin'
+    ],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 86400 // 24 horas
 };
 exports.jsonConfig = {
     limit: "10mb", //payload limit
