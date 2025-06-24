@@ -4,20 +4,15 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
-
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT || "5432"),
-  username: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "admin",
-  database: process.env.DB_NAME || "studify_db",
+  url: process.env.DATABASE_URL,
   synchronize: true,
   logging: true,
   entities: ["src/models/**/*.ts"],
   migrations: ["src/migrations/**/*.ts"],
   subscribers: ["src/subscribers/**/*.ts"],
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 
 export const connectDB = async () => {
