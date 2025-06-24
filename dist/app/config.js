@@ -50,34 +50,11 @@ exports.origin = process.env.origin;
 exports.NODE_ENV = process.env.NODE_ENV;
 // Configuración de CORS para desarrollo y producción
 const getCorsOrigins = () => {
-    // Por ahora, permitir todos los orígenes
-    return ['*'];
-    // TODO: Configurar orígenes específicos más adelante
-    // Si hay una variable de entorno específica para CORS, usarla
-    // if (origin) {
-    //     const origins = origin.split(',').map(origin => origin.trim());
-    //     // En desarrollo, asegurar que localhost:5173 esté incluido
-    //     if (NODE_ENV === 'development' && !origins.includes('http://localhost:5173')) {
-    //         origins.push('http://localhost:5173');
-    //     }
-    //     return origins;
-    // }
-    // // En desarrollo, permitir localhost
-    // if (NODE_ENV === 'development') {
-    //     return [
-    //         'http://localhost:3000',
-    //         'http://localhost:3001', 
-    //         'http://localhost:5173', // Vite default
-    //         'http://localhost:8080', // Vue CLI default
-    //         'http://127.0.0.1:3000',
-    //         'http://127.0.0.1:3001',
-    //         'http://127.0.0.1:5173',
-    //         'http://127.0.0.1:8080'
-    //     ];
-    // }
-    // // En producción, permitir cualquier origen (o configurar específicos)
-    // // Puedes cambiar esto por dominios específicos si quieres más seguridad
-    // return ['*'];
+    // Permitir el frontend local y el dominio de producción
+    return [
+        'http://localhost:5173',
+        'https://genuine-anette-devnotmax-69217c46.koyeb.app'
+    ];
 };
 exports.corsconfig = {
     origin: function (origin, callback) {
