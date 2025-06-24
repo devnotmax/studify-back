@@ -13,6 +13,7 @@ exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const session_model_1 = require("./session.model");
 const user_stats_model_1 = require("./user-stats.model");
+const achievement_model_1 = require("./achievement.model");
 let User = class User {
 };
 exports.User = User;
@@ -31,7 +32,15 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], User.prototype, "name", void 0);
+], User.prototype, "firstName", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], User.prototype, "lastName", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Date)
+], User.prototype, "birthDate", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: "enum",
@@ -56,6 +65,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => user_stats_model_1.UserStats, (stats) => stats.user),
     __metadata("design:type", Array)
 ], User.prototype, "stats", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => achievement_model_1.Achievement, (achievement) => achievement.user),
+    __metadata("design:type", Array)
+], User.prototype, "achievements", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)("users")
 ], User);

@@ -52,6 +52,18 @@ __decorate([
     __metadata("design:type", Number)
 ], UserStats.prototype, "totalLongBreakTime", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], UserStats.prototype, "currentStreak", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 0 }),
+    __metadata("design:type", Number)
+], UserStats.prototype, "longestStreak", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'date', nullable: true }),
+    __metadata("design:type", Date)
+], UserStats.prototype, "lastActivityDate", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.stats),
     __metadata("design:type", user_model_1.User)
 ], UserStats.prototype, "user", void 0);

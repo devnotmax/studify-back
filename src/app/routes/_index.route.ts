@@ -6,7 +6,7 @@ import put from './put.route'
 import deleted from './delete.route'
 import authRoutes from '../../routes/auth.routes'
 
-const router = express();
+const router = express.Router();
 
 router.use('/post', post)
 router.use('/get', get)

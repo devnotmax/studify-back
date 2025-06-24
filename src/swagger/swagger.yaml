@@ -1,0 +1,521 @@
+openapi: 3.0.0
+info:
+  title: Pomodoro API
+  version: 1.0.0
+  description: API para la aplicación Pomodoro con sistema de sesiones y gamificación
+
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        role:
+          type: string
+          enum: [user, admin]
+          default: user
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRegister:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+        - birthDate
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email del usuario
+        password:
+          type: string
+          minLength: 6
+          description: Contraseña del usuario (mínimo 6 caracteres)
+        firstName:
+          type: string
+          description: Nombre del usuario
+        lastName:
+          type: string
+          description: Apellido del usuario
+        birthDate:
+          type: string
+          format: date
+          description: Fecha de nacimiento del usuario
+
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+          description: JWT token para autenticación
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sessionType:
+          type: string
+          enum: [FOCUS, SHORT_BREAK, LONG_BREAK]
+        duration:
+          type: number
+          description: Duración en minutos
+        completedTime:
+          type: number
+          description: Tiempo completado en minutos
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        isCompleted:
+          type: boolean
+        isCancelled:
+          type: boolean
+        isPaused:
+          type: boolean
+        isResumed:
+          type: boolean
+
+    StreakInfo:
+      type: object
+      properties:
+        currentStreak:
+          type: integer
+          description: Racha actual de días consecutivos
+        longestStreak:
+          type: integer
+          description: Racha más larga de días consecutivos
+        lastActivityDate:
+          type: string
+          format: date-time
+          description: Fecha de la última actividad
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        condition:
+          type: string
+        conditionValue:
+          type: number
+        isCompleted:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+
+paths:
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegister"
+            examples:
+              ejemplo_registro:
+                value:
+                  email: "usuario@ejemplo.com"
+                  password: "123456"
+                  firstName: "Juan"
+                  lastName: "Pérez"
+                  birthDate: "1990-01-01"
+      responses:
+        "201":
+          description: Usuario registrado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              examples:
+                registro_exitoso:
+                  value:
+                    message: "User registered successfully"
+                    user:
+                      id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                      email: "usuario@ejemplo.com"
+                      firstName: "Juan"
+                      lastName: "Pérez"
+                      birthDate: "1990-01-01"
+                      role: "user"
+                      createdAt: "2024-01-01T12:00:00Z"
+                      updatedAt: "2024-01-01T12:00:00Z"
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "400":
+          description: Error en los datos de entrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                email_existente:
+                  value:
+                    message: "Email already registered"
+                datos_invalidos:
+                  value:
+                    message: "Invalid input data"
+
+  /auth/login:
+    post:
+      summary: Iniciar sesión de usuario
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+            examples:
+              ejemplo_login:
+                value:
+                  email: "usuario@ejemplo.com"
+                  password: "123456"
+      responses:
+        "200":
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              examples:
+                login_exitoso:
+                  value:
+                    message: "Login successful"
+                    user:
+                      id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                      email: "usuario@ejemplo.com"
+                      firstName: "Juan"
+                      lastName: "Pérez"
+                      birthDate: "1990-01-01"
+                      role: "user"
+                      createdAt: "2024-01-01T12:00:00Z"
+                      updatedAt: "2024-01-01T12:00:00Z"
+                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "401":
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                credenciales_invalidas:
+                  value:
+                    message: "Invalid credentials"
+
+  /sessions:
+    post:
+      summary: Iniciar una nueva sesión
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sessionType
+                - duration
+              properties:
+                sessionType:
+                  type: string
+                  enum: [FOCUS, SHORT_BREAK, LONG_BREAK]
+                duration:
+                  type: number
+      responses:
+        "201":
+          description: Sesión iniciada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  session:
+                    $ref: "#/components/schemas/Session"
+        "400":
+          description: Ya existe una sesión activa
+        "401":
+          description: No autorizado
+
+  /sessions/{sessionId}/end:
+    put:
+      summary: Finalizar una sesión
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - completedTime
+              properties:
+                completedTime:
+                  type: number
+      responses:
+        "200":
+          description: Sesión finalizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  session:
+                    $ref: "#/components/schemas/Session"
+                  streak:
+                    $ref: "#/components/schemas/StreakInfo"
+        "404":
+          description: Sesión no encontrada
+
+  /sessions/{sessionId}/cancel:
+    put:
+      summary: Cancelar una sesión
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sessionId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Sesión cancelada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  session:
+                    $ref: "#/components/schemas/Session"
+        "404":
+          description: Sesión no encontrada
+
+  /sessions/active:
+    get:
+      summary: Obtener sesión activa
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sesión activa encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session:
+                    $ref: "#/components/schemas/Session"
+
+  /sessions/history:
+    get:
+      summary: Obtener historial de sesiones
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Historial de sesiones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Session"
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+  /sessions/streak:
+    get:
+      summary: Obtener información de la racha
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Información de la racha obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  streak:
+                    $ref: "#/components/schemas/StreakInfo"
+        "404":
+          description: Estadísticas de usuario no encontradas
+
+  /achievements:
+    get:
+      summary: Obtener los logros del usuario autenticado
+      tags: [Achievements]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de logros del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  achievements:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Achievement"
+              examples:
+                ejemplo:
+                  value:
+                    achievements:
+                      - id: "a1b2c3d4"
+                        name: "Primera Sesión"
+                        description: "Completa tu primera sesión de focus"
+                        condition: "sessions"
+                        conditionValue: 1
+                        isCompleted: true
+                        completedAt: "2024-06-01T12:00:00Z"
+                      - id: "e5f6g7h8"
+                        name: "Focus Master"
+                        description: "Completa 25 sesiones de focus"
+                        condition: "sessions"
+                        conditionValue: 25
+                        isCompleted: false
+                        completedAt: null
+        "401":
+          description: No autorizado
+
+  /achievements/check:
+    post:
+      summary: Verificar y actualizar los logros del usuario autenticado
+      tags: [Achievements]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logros verificados y nuevos logros desbloqueados (si corresponde)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  newAchievements:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Achievement"
+              examples:
+                ejemplo:
+                  value:
+                    message: "Logros verificados correctamente"
+                    newAchievements:
+                      - id: "a1b2c3d4"
+                        name: "Primera Sesión"
+                        description: "Completa tu primera sesión de focus"
+                        condition: "sessions"
+                        conditionValue: 1
+                        isCompleted: true
+                        completedAt: "2024-06-01T12:00:00Z"
+        "401":
+          description: No autorizado

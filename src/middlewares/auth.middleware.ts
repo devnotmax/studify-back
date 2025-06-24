@@ -1,18 +1,40 @@
-import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/jwt.utils';
+import { Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { AppDataSource } from '../app/config/database/connection';
+import { User } from '../models/user.model';
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (
+    req: any,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
     try {
         const token = req.headers.authorization?.split(' ')[1];
-        
+
         if (!token) {
-            return res.status(401).json({ message: 'No token provided' });
+            res.status(401).json({
+                message: 'No token provided'
+            });
+            return;
         }
 
-        const decoded = verifyToken(token);
-        req.user = decoded;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { id: string };
+        const userRepository = AppDataSource.getRepository(User);
+        const user = await userRepository.findOne({ where: { id: decoded.id } });
+
+        if (!user) {
+            res.status(401).json({
+                message: 'User not found'
+            });
+            return;
+        }
+
+        req.user = user;
         next();
     } catch (error) {
-        return res.status(401).json({ message: 'Invalid token' });
+        res.status(401).json({
+            message: 'Invalid token'
+        });
+        return;
     }
 }; 

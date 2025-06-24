@@ -30,6 +30,15 @@ export class UserStats {
     @Column()
     totalLongBreakTime!: number;
 
+    @Column({ default: 0 })
+    currentStreak!: number;
+
+    @Column({ default: 0 })
+    longestStreak!: number;
+
+    @Column({ type: 'date', nullable: true })
+    lastActivityDate!: Date;
+
     @ManyToOne(() => User, (user) => user.stats)
     user!: User;
 } 

@@ -13,6 +13,22 @@ app.use(cors(corsconfig));
 app.use(express.json(jsonConfig));
 app.use(express.urlencoded(urlencodeconfig));
 app.use(morgan("dev"));
+
+// Middleware de logging para debuggear
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+    next();
+});
+
+// Endpoint de prueba
+app.get('/api/test', (req, res) => {
+    res.json({ 
+        message: 'API funcionando correctamente',
+        timestamp: new Date().toISOString(),
+        cors: 'Configurado'
+    });
+});
+
 app.use("/api", router);
 
 // Middleware de manejo de errores (debe ir después de las rutas)

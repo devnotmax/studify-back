@@ -9,6 +9,7 @@ import {
 import { Session } from "./session.model";
 import { UserStats } from "./user-stats.model";
 import { IUser } from "../interfaces/user.interface";
+import { Achievement } from "./achievement.model";
 
 @Entity("users")
 export class User implements IUser {
@@ -47,5 +48,8 @@ export class User implements IUser {
   sessions!: Session[];
 
   @OneToMany(() => UserStats, (stats) => stats.user)
-  stats!: UserStats[];  
+  stats!: UserStats[];
+
+  @OneToMany(() => Achievement, (achievement) => achievement.user)
+  achievements!: Achievement[];
 }

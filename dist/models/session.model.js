@@ -26,19 +26,23 @@ __decorate([
         enum: types_1.SessionType,
     }),
     __metadata("design:type", String)
-], Session.prototype, "type", void 0);
+], Session.prototype, "sessionType", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Session.prototype, "duration", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", Date)
-], Session.prototype, "start", void 0);
+    __metadata("design:type", Number)
+], Session.prototype, "completedTime", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Date)
-], Session.prototype, "end", void 0);
+], Session.prototype, "startTime", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", Date)
+], Session.prototype, "endTime", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)

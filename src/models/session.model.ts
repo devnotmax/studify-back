@@ -18,16 +18,19 @@ export class Session {
     type: "enum",
     enum: SessionType,
   })
-  type!: SessionType;
+  sessionType!: SessionType;
 
   @Column()
   duration!: number;
 
   @Column()
-  start!: Date;
+  completedTime!: number;
 
   @Column()
-  end!: Date;
+  startTime!: Date;
+
+  @Column()
+  endTime!: Date;
 
   @Column()
   userId!: string;
