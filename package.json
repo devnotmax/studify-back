@@ -11,7 +11,8 @@
     "build": "npm run clean && tsc",
     "build:render": "npm install --include=dev && npm run build",
     "heroku-postbuild": "npm install --omit=dev=false && npm run build",
-    "check-env": "node scripts/check-env.js"
+    "check-env": "node scripts/check-env.js",
+    "check-supabase": "node scripts/fix-supabase-url.js"
   },
   "author": "Loza64",
   "license": "ISC",

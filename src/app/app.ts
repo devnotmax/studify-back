@@ -20,6 +20,17 @@ app.use((req, res, next) => {
     next();
 });
 
+// Health check para Render (en la raíz)
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
+        database: 'Connected' // Esto cambiará cuando conectemos la BD
+    });
+});
+
 // Endpoint de prueba
 app.get('/api/test', (req, res) => {
     res.json({ 
