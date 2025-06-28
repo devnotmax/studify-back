@@ -27,6 +27,8 @@ export const getRenderDatabaseConfig = (): DataSourceOptions => {
       extra: {
         ssl: {
           rejectUnauthorized: false,
+          // Configuración específica para Supabase
+          checkServerIdentity: () => undefined,
         },
         connectionTimeoutMillis: 30000,
         idleTimeoutMillis: 30000,
@@ -40,7 +42,15 @@ export const getRenderDatabaseConfig = (): DataSourceOptions => {
   return {
     ...baseConfig,
     url: process.env.DATABASE_URL,
-    ssl: false,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+    extra: {
+      ssl: {
+        rejectUnauthorized: false,
+        checkServerIdentity: () => undefined,
+      },
+    },
   };
 };
 

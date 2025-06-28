@@ -12,7 +12,9 @@
     "build:render": "npm install --include=dev && npm run build",
     "heroku-postbuild": "npm install --omit=dev=false && npm run build",
     "check-env": "node scripts/check-env.js",
-    "check-supabase": "node scripts/fix-supabase-url.js"
+    "check-supabase": "node scripts/fix-supabase-url.js",
+    "diagnose-db": "node scripts/diagnose-db.js",
+    "setup-env": "node scripts/setup-env.js"
   },
   "author": "Loza64",
   "license": "ISC",
