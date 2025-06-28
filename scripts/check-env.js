@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 const requiredEnvVars = [
-  'NODE_ENV',
-  'PORT',
   'DATABASE_URL'
 ];
 
 const optionalEnvVars = [
+  'NODE_ENV',
+  'PORT',
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'origin'
@@ -46,6 +46,11 @@ if (process.env.DATABASE_URL) {
   const dbUrl = process.env.DATABASE_URL;
   const hasSSL = dbUrl.includes('sslmode=require') || dbUrl.includes('ssl=true');
   console.log(`DATABASE_URL: ${hasSSL ? '✅ Con SSL' : '⚠️  Sin SSL (recomendado para producción)'}`);
+  
+  // Si es Supabase y no tiene SSL, mostrar advertencia
+  if (dbUrl.includes('supabase.co') && !hasSSL) {
+    console.log('💡 Para Supabase en producción, agrega ?sslmode=require al final de la URL');
+  }
 }
 
 console.log('\n' + '='.repeat(50));
