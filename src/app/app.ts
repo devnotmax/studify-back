@@ -5,6 +5,7 @@ import { corsconfig, jsonConfig, urlencodeconfig } from "./config";
 import cors from "cors";
 import helmet from "helmet";
 import { errorHandler } from "../middlewares/error.middleware";
+import { AppDataSource } from "./config/database/connection";
 
 const app = express();
 
@@ -27,7 +28,17 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: process.env.NODE_ENV || 'development',
-        database: 'Connected' // Esto cambiará cuando conectemos la BD
+        database: AppDataSource.isInitialized ? 'Connected' : 'Disconnected'
+    });
+});
+
+// Endpoint para verificar estado de la base de datos
+app.get('/api/db-status', (req, res) => {
+    const isConnected = AppDataSource.isInitialized;
+    res.json({
+        database: isConnected ? 'Connected' : 'Disconnected',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
 });
 
@@ -36,7 +47,8 @@ app.get('/api/test', (req, res) => {
     res.json({ 
         message: 'API funcionando correctamente',
         timestamp: new Date().toISOString(),
-        cors: 'Configurado'
+        cors: 'Configurado',
+        database: AppDataSource.isInitialized ? 'Connected' : 'Disconnected'
     });
 });
 
