@@ -8,6 +8,16 @@ import authRoutes from '../../routes/auth.routes'
 
 const router = express.Router();
 
+// Health check para Render
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 router.use('/post', post)
 router.use('/get', get)
 router.use('/patch', patch)
