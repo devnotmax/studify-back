@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import { database } from "../../../app/config";
 import dotenv from "dotenv";
-import { getRenderDatabaseConfig, validateDatabaseConfig } from "./render-config";
+import { getSupabaseDatabaseConfig } from "./supabase-config";
 
 dotenv.config();
 
@@ -15,22 +15,14 @@ console.log("[DEBUG] Entities path:", entitiesPath);
 console.log("[DEBUG] Migrations path:", migrationsPath);
 console.log("[DEBUG] Subscribers path:", subscribersPath);
 
-// Usar la configuración específica para Render
-export const AppDataSource = new DataSource(getRenderDatabaseConfig());
+// Usar la configuración específica para Supabase
+export const AppDataSource = new DataSource(getSupabaseDatabaseConfig());
 
 export const connectDB = async () => {
   try {
     console.log("[DEBUG] Iniciando conexión a la base de datos...");
     console.log("[DEBUG] NODE_ENV:", process.env.NODE_ENV);
     console.log("[DEBUG] DATABASE_URL exists:", !!process.env.DATABASE_URL);
-    
-    // Validar configuración antes de intentar conectar
-    const validation = validateDatabaseConfig();
-    if (!validation.isValid) {
-      console.error("[ERROR] Configuración de base de datos inválida:");
-      validation.errors.forEach(error => console.error(`  - ${error}`));
-      throw new Error("Configuración de base de datos inválida");
-    }
     
     const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error("Timeout al conectar a la base de datos")), 30000)
