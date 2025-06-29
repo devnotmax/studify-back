@@ -1,4 +1,8 @@
 import "reflect-metadata";
+
+// Configurar Node.js para aceptar certificados SSL no confiables (específico para Supabase)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 import app from "./app/app";
 import { port, server } from "./app/config";
 import { connectDB } from "./app/config/database/connection";
@@ -9,13 +13,14 @@ import achievementRoutes from "./routes/achievement.routes";
 const startServer = async () => {
   try {
     console.log("[DEBUG] Iniciando aplicación...");
+    console.log("[DEBUG] NODE_TLS_REJECT_UNAUTHORIZED:", process.env.NODE_TLS_REJECT_UNAUTHORIZED);
     
     // Intentar conectar a la base de datos
     try {
       await connectDB();
       console.log("[DEBUG] Conexión a la base de datos exitosa.");
     } catch (dbError: any) {
-      console.error("[WARNING] No se pudo conectar a la base de datos:", dbError?.message || dbError);
+      console.error("[WARNING] No se pudo conectar a la base de datos:", dbError.message);
       console.log("[INFO] La aplicación continuará sin base de datos.");
     }
 
