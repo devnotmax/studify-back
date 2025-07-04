@@ -5,7 +5,8 @@ import {
   cancelSession,
   getActiveSession,
   getSessionHistory,
-  getStreakInfo
+  getStreakInfo,
+  getSessionStats,
 } from "../controllers/session.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
@@ -28,5 +29,8 @@ router.get("/history", authMiddleware, getSessionHistory);
 
 // Obtener información de la racha
 router.get("/streak", authMiddleware, getStreakInfo);
+
+// Obtener estadísticas de sesiones (hoy, semana, total)
+router.get("/stats", authMiddleware, getSessionStats);
 
 export default router;

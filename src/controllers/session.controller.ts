@@ -5,6 +5,7 @@ import { SessionType } from "../types";
 import { StreakService } from "../services/streak.service";
 import { User } from "../models/user.model";
 import { AchievementService } from "../services/achievement.service";
+import { MoreThanOrEqual } from "typeorm";
 
 const sessionRepository = AppDataSource.getRepository(Session);
 
@@ -69,16 +70,24 @@ export const startSession = async (req: any, res: Response): Promise<void> => {
 
 export const endSession = async (req: any, res: Response): Promise<void> => {
     try {
+        console.log("Iniciando endSession con:", {
+            sessionId: req.params.sessionId,
+            completedTime: req.body.completedTime,
+            userId: req.user?.id
+        });
+        
         const { sessionId } = req.params;
         const { completedTime } = req.body;
         const userId = req.user.id;
 
+        console.log("Buscando sesión con ID:", sessionId, "para usuario:", userId);
         const session = await sessionRepository.findOne({
             where: {
                 id: sessionId,
                 userId
             }
         });
+        console.log("Sesión encontrada:", session ? "Sí" : "No");
 
         if (!session) {
             res.status(404).json({
@@ -109,10 +118,21 @@ export const endSession = async (req: any, res: Response): Promise<void> => {
             },
             newAchievements
         });
-    } catch (error) {
+    } catch (error: any) {
+        console.error("Error detallado al finalizar sesión:", {
+            error: error,
+            message: error?.message,
+            stack: error?.stack,
+            userId: req.user?.id,
+            sessionId: req.params.sessionId
+        });
+        
         res.status(500).json({
             message: "Error al finalizar la sesión",
-            error
+            error: {
+                message: error?.message || "Error desconocido",
+                type: error?.constructor?.name || "Unknown"
+            }
         });
     }
 };
@@ -217,6 +237,55 @@ export const getStreakInfo = async (req: any, res: Response): Promise<void> => {
     } catch (error) {
         res.status(500).json({
             message: "Error al obtener la información de la racha",
+            error
+        });
+    }
+};
+
+export const getSessionStats = async (req: any, res: Response): Promise<void> => {
+    try {
+        const userId = req.user.id;
+        const today = new Date();
+        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Domingo como inicio de semana
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        // Sesiones completadas y no canceladas
+        const total = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false
+            }
+        });
+
+        const todayCount = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false,
+                startTime: MoreThanOrEqual(startOfToday)
+            }
+        });
+
+        const weekCount = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false,
+                startTime: MoreThanOrEqual(startOfWeek)
+            }
+        });
+
+        res.status(200).json({
+            today: todayCount,
+            week: weekCount,
+            total
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error al obtener las estadísticas de sesiones",
             error
         });
     }

@@ -5,6 +5,7 @@ import patch from './patch.route'
 import put from './put.route'
 import deleted from './delete.route'
 import authRoutes from '../../routes/auth.routes'
+import sessionRoutes from '../../routes/session.routes'
 
 const router = express.Router();
 
@@ -24,5 +25,7 @@ router.use('/patch', patch)
 router.use('/put', put)
 router.use('/delete', deleted)
 router.use('/auth', authRoutes)
+router.use('/sessions', sessionRoutes)
+console.log('Rutas de sesión montadas en /api/sessions')
 
 export default router;

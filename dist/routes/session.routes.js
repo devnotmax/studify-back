@@ -16,4 +16,6 @@ router.get("/active", auth_middleware_1.authMiddleware, session_controller_1.get
 router.get("/history", auth_middleware_1.authMiddleware, session_controller_1.getSessionHistory);
 // Obtener información de la racha
 router.get("/streak", auth_middleware_1.authMiddleware, session_controller_1.getStreakInfo);
+// Obtener estadísticas de sesiones (hoy, semana, total)
+router.get("/stats", auth_middleware_1.authMiddleware, session_controller_1.getSessionStats);
 exports.default = router;

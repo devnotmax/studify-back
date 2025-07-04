@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getStreakInfo = exports.getSessionHistory = exports.getActiveSession = exports.cancelSession = exports.endSession = exports.startSession = void 0;
+exports.getSessionStats = exports.getStreakInfo = exports.getSessionHistory = exports.getActiveSession = exports.cancelSession = exports.endSession = exports.startSession = void 0;
 const connection_1 = require("../app/config/database/connection");
 const session_model_1 = require("../models/session.model");
 const streak_service_1 = require("../services/streak.service");
 const achievement_service_1 = require("../services/achievement.service");
+const typeorm_1 = require("typeorm");
 const sessionRepository = connection_1.AppDataSource.getRepository(session_model_1.Session);
 const startSession = async (req, res) => {
     try {
@@ -47,16 +48,24 @@ const startSession = async (req, res) => {
 };
 exports.startSession = startSession;
 const endSession = async (req, res) => {
+    var _a, _b, _c;
     try {
+        console.log("Iniciando endSession con:", {
+            sessionId: req.params.sessionId,
+            completedTime: req.body.completedTime,
+            userId: (_a = req.user) === null || _a === void 0 ? void 0 : _a.id
+        });
         const { sessionId } = req.params;
         const { completedTime } = req.body;
         const userId = req.user.id;
+        console.log("Buscando sesión con ID:", sessionId, "para usuario:", userId);
         const session = await sessionRepository.findOne({
             where: {
                 id: sessionId,
                 userId
             }
         });
+        console.log("Sesión encontrada:", session ? "Sí" : "No");
         if (!session) {
             res.status(404).json({
                 message: "Sesión no encontrada"
@@ -83,9 +92,19 @@ const endSession = async (req, res) => {
         });
     }
     catch (error) {
+        console.error("Error detallado al finalizar sesión:", {
+            error: error,
+            message: error === null || error === void 0 ? void 0 : error.message,
+            stack: error === null || error === void 0 ? void 0 : error.stack,
+            userId: (_b = req.user) === null || _b === void 0 ? void 0 : _b.id,
+            sessionId: req.params.sessionId
+        });
         res.status(500).json({
             message: "Error al finalizar la sesión",
-            error
+            error: {
+                message: (error === null || error === void 0 ? void 0 : error.message) || "Error desconocido",
+                type: ((_c = error === null || error === void 0 ? void 0 : error.constructor) === null || _c === void 0 ? void 0 : _c.name) || "Unknown"
+            }
         });
     }
 };
@@ -189,3 +208,49 @@ const getStreakInfo = async (req, res) => {
     }
 };
 exports.getStreakInfo = getStreakInfo;
+const getSessionStats = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const today = new Date();
+        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay()); // Domingo como inicio de semana
+        startOfWeek.setHours(0, 0, 0, 0);
+        // Sesiones completadas y no canceladas
+        const total = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false
+            }
+        });
+        const todayCount = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false,
+                startTime: (0, typeorm_1.MoreThanOrEqual)(startOfToday)
+            }
+        });
+        const weekCount = await sessionRepository.count({
+            where: {
+                userId,
+                isCompleted: true,
+                isCancelled: false,
+                startTime: (0, typeorm_1.MoreThanOrEqual)(startOfWeek)
+            }
+        });
+        res.status(200).json({
+            today: todayCount,
+            week: weekCount,
+            total
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error al obtener las estadísticas de sesiones",
+            error
+        });
+    }
+};
+exports.getSessionStats = getSessionStats;

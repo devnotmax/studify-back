@@ -32,16 +32,16 @@ __decorate([
     __metadata("design:type", Number)
 ], Session.prototype, "duration", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ default: 0 }),
     __metadata("design:type", Number)
 ], Session.prototype, "completedTime", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: "timestamp" }),
     __metadata("design:type", Date)
 ], Session.prototype, "startTime", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", Date)
+    (0, typeorm_1.Column)({ nullable: true, type: "timestamp" }),
+    __metadata("design:type", Object)
 ], Session.prototype, "endTime", void 0);
 __decorate([
     (0, typeorm_1.Column)(),

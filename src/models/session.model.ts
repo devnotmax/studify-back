@@ -22,15 +22,14 @@ export class Session {
 
   @Column()
   duration!: number;
-
-  @Column()
+  @Column({ default: 0 })
   completedTime!: number;
 
-  @Column()
+  @Column({ type: "timestamp" })
   startTime!: Date;
 
-  @Column()
-  endTime!: Date;
+  @Column({ nullable: true, type: "timestamp" })
+  endTime!: Date | null;
 
   @Column()
   userId!: string;
