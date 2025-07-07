@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const stats_controller_1 = require("../controllers/stats.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const router = (0, express_1.Router)();
+router.get('/productivity-hours', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.productivityHours);
+router.get('/weekly-productivity', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.weeklyProductivity);
+router.get('/type-distribution', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.typeDistribution);
+router.get('/daily-history', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.dailyHistory);
+router.get('/monthly-productivity', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.monthlyProductivity);
+router.get('/streak', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.streak);
+router.get('/average-session-duration', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.averageSessionDuration);
+router.get('/session-status', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.sessionStatus);
+router.get('/weekly-in-month', auth_middleware_1.authMiddleware, stats_controller_1.StatsController.weeklyInMonth);
+exports.default = router;

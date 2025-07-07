@@ -12,6 +12,7 @@ const connection_1 = require("./app/config/database/connection");
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const session_routes_1 = __importDefault(require("./routes/session.routes"));
 const achievement_routes_1 = __importDefault(require("./routes/achievement.routes"));
+const stats_routes_1 = __importDefault(require("./routes/stats.routes"));
 const startServer = async () => {
     try {
         console.log("[DEBUG] Iniciando aplicación...");
@@ -29,6 +30,7 @@ const startServer = async () => {
         app_1.default.use("/api/auth", auth_routes_1.default);
         app_1.default.use("/api/sessions", session_routes_1.default);
         app_1.default.use("/api/achievements", achievement_routes_1.default);
+        app_1.default.use("/api/stats", stats_routes_1.default);
         console.log("[DEBUG] Rutas configuradas.");
         // Iniciar servidor
         console.log(`[DEBUG] Iniciando servidor en puerto: ${config_1.port}`);

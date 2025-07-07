@@ -50,43 +50,22 @@ exports.origin = process.env.origin;
 exports.NODE_ENV = process.env.NODE_ENV;
 // Configuración de CORS para desarrollo y producción
 const getCorsOrigins = () => {
-    // Permitir el frontend local y el dominio de producción
-    return [
-        'http://localhost:5173',
-        'https://genuine-anette-devnotmax-69217c46.koyeb.app'
-    ];
+    // Permitir todos los orígenes para desarrollo y producción
+    return ["*"];
 };
 exports.corsconfig = {
-    origin: function (origin, callback) {
-        // Permitir requests sin origin (como aplicaciones móviles o Postman)
-        if (!origin)
-            return callback(null, true);
-        const allowedOrigins = getCorsOrigins();
-        // Si está configurado para permitir todos los orígenes
-        if (allowedOrigins.includes('*')) {
-            return callback(null, true);
-        }
-        // Verificar si el origen está permitido
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        }
-        else {
-            console.log('CORS blocked origin:', origin);
-            console.log('Allowed origins:', allowedOrigins);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true, // Permitir todos los orígenes
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'Accept',
-        'Origin'
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
     ],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    maxAge: 86400 // 24 horas
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
+    maxAge: 86400, // 24 horas
 };
 exports.jsonConfig = {
     limit: "10mb", //payload limit

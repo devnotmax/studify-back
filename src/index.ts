@@ -9,6 +9,7 @@ import { connectDB } from "./app/config/database/connection";
 import authRoutes from "./routes/auth.routes";
 import sessionRoutes from "./routes/session.routes";
 import achievementRoutes from "./routes/achievement.routes";
+import statsRoutes from "./routes/stats.routes";
 
 const startServer = async () => {
   try {
@@ -28,6 +29,7 @@ const startServer = async () => {
     app.use("/api/auth", authRoutes);
     app.use("/api/sessions", sessionRoutes);
     app.use("/api/achievements", achievementRoutes);
+    app.use("/api/stats", statsRoutes);
     console.log("[DEBUG] Rutas configuradas.");
 
     // Iniciar servidor

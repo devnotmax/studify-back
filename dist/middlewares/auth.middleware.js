@@ -19,7 +19,7 @@ const authMiddleware = async (req, res, next) => {
         }
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || 'your-secret-key');
         const userRepository = connection_1.AppDataSource.getRepository(user_model_1.User);
-        const user = await userRepository.findOne({ where: { id: decoded.id } });
+        const user = await userRepository.findOne({ where: { id: decoded.userId } });
         if (!user) {
             res.status(401).json({
                 message: 'User not found'
