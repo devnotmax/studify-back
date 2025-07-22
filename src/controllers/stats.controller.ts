@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { StatsService } from '../services/stats.service';
+import { StreakService } from '../services/streak.service';
 
 export class StatsController {
     static async productivityHours(req: any, res: Response) {
@@ -56,8 +57,9 @@ export class StatsController {
     static async streak(req: any, res: Response) {
         try {
             const userId = req.user.id;
-            const data = await StatsService.getStreak(userId);
-            res.json(data);
+            // Usar la lógica corregida de StreakService
+            const data = await StreakService.getStreakInfo(userId);
+            res.json({ streak: data });
         } catch (error: any) {
             res.status(500).json({ message: error.message });
         }

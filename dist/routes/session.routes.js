@@ -18,4 +18,10 @@ router.get("/history", auth_middleware_1.authMiddleware, session_controller_1.ge
 router.get("/streak", auth_middleware_1.authMiddleware, session_controller_1.getStreakInfo);
 // Obtener estadísticas de sesiones (hoy, semana, total)
 router.get("/stats", auth_middleware_1.authMiddleware, session_controller_1.getSessionStats);
+// Pausar sesión
+router.put("/:sessionId/pause", auth_middleware_1.authMiddleware, require('../controllers/session.controller').pauseSession);
+// Reanudar sesión
+router.put("/:sessionId/resume", auth_middleware_1.authMiddleware, require('../controllers/session.controller').resumeSession);
+// Obtener tiempo restante real
+router.get("/:sessionId/remaining", auth_middleware_1.authMiddleware, require('../controllers/session.controller').getSessionRemaining);
 exports.default = router;

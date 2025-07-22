@@ -46,6 +46,12 @@ export class Session {
   @Column({ default: false })
   isResumed!: boolean;
 
+  @Column({ nullable: true, type: "timestamp" })
+  pausedAt?: Date | null;
+
+  @Column({ default: 0, type: "int" })
+  elapsedBeforePause!: number;
+
   @ManyToOne(() => User, (user) => user.sessions)
   user!: User;
 }

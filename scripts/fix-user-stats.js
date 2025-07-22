@@ -38,56 +38,41 @@ async function fixUserStats() {
                 continue;
             }
 
-            // Calcular racha
-            let currentStreak = 0;
-            let longestStreak = 0;
-            let lastActivityDate = null;
-            let consecutiveDays = 0;
-
+            // Calcular estadísticas completas
+            userStats.totalSessions = completedSessions.length;
+            userStats.totalTime = completedSessions.reduce((acc, session) => acc + session.completedTime, 0);
+            userStats.averageSessionDuration = userStats.totalSessions > 0 ? Math.round((userStats.totalTime / userStats.totalSessions) * 100) / 100 : 0;
+            userStats.longestSession = 0;
+            userStats.longestSessionDate = null;
+            userStats.totalFocusTime = 0;
+            userStats.totalBreakTime = 0;
+            userStats.totalLongBreakTime = 0;
             for (const session of completedSessions) {
-                const sessionDate = startOfDay(session.endTime);
-                
-                if (!lastActivityDate) {
-                    // Primera sesión
-                    consecutiveDays = 1;
-                    currentStreak = 1;
-                    longestStreak = 1;
-                } else {
-                    const lastDate = startOfDay(lastActivityDate);
-                    
-                    if (isSameDay(sessionDate, lastDate)) {
-                        // Mismo día, mantener racha
-                        // No hacer nada
-                    } else if (isSameDay(sessionDate, addDays(lastDate, 1))) {
-                        // Día consecutivo, incrementar racha
-                        consecutiveDays++;
-                        currentStreak = consecutiveDays;
-                        longestStreak = Math.max(longestStreak, consecutiveDays);
-                    } else {
-                        // Día no consecutivo, reiniciar racha
-                        consecutiveDays = 1;
-                        currentStreak = 1;
-                    }
+                if (session.completedTime > userStats.longestSession) {
+                    userStats.longestSession = session.completedTime;
+                    userStats.longestSessionDate = session.endTime;
                 }
-                
-                lastActivityDate = sessionDate;
+                if (session.sessionType === 'focus') {
+                    userStats.totalFocusTime += session.completedTime;
+                } else if (session.sessionType === 'short_break') {
+                    userStats.totalBreakTime += session.completedTime;
+                } else if (session.sessionType === 'long_break') {
+                    userStats.totalLongBreakTime += session.completedTime;
+                }
             }
 
             // Actualizar estadísticas
-            userStats.currentStreak = currentStreak;
-            userStats.longestStreak = longestStreak;
-            userStats.lastActivityDate = lastActivityDate;
-            userStats.totalSessions = completedSessions.length;
-            userStats.totalTime = completedSessions.reduce((acc, session) => acc + session.completedTime, 0);
-            userStats.totalFocusTime = completedSessions.reduce((acc, session) => acc + session.completedTime, 0);
-
             await userStatsRepository.save(userStats);
 
             console.log(`Usuario ${userStats.user.id} actualizado:`, {
-                currentStreak,
-                longestStreak,
                 totalSessions: completedSessions.length,
-                lastActivityDate
+                totalTime: userStats.totalTime,
+                averageSessionDuration: userStats.averageSessionDuration,
+                longestSession: userStats.longestSession,
+                longestSessionDate: userStats.longestSessionDate,
+                totalFocusTime: userStats.totalFocusTime,
+                totalBreakTime: userStats.totalBreakTime,
+                totalLongBreakTime: userStats.totalLongBreakTime
             });
         }
 

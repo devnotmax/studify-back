@@ -302,5 +302,45 @@ class StatsService {
             ]
         };
     }
+    static async updateUserStats(userId, session) {
+        const userStatsRepo = connection_1.AppDataSource.getRepository(require('../models/user-stats.model').UserStats);
+        let userStats = await userStatsRepo.findOne({ where: { user: { id: userId } } });
+        if (!userStats) {
+            // Crear estadísticas si no existen
+            userStats = userStatsRepo.create({
+                totalSessions: 0,
+                totalTime: 0,
+                averageSessionDuration: 0,
+                longestSession: 0,
+                longestSessionDate: new Date(),
+                totalFocusTime: 0,
+                totalBreakTime: 0,
+                totalLongBreakTime: 0,
+                user: { id: userId },
+            });
+        }
+        // Actualizar totales
+        userStats.totalSessions += 1;
+        userStats.totalTime += session.completedTime;
+        // Actualizar promedio
+        userStats.averageSessionDuration = userStats.totalSessions > 0 ? Math.round((userStats.totalTime / userStats.totalSessions) * 100) / 100 : 0;
+        // Actualizar sesión más larga
+        if (session.completedTime > userStats.longestSession) {
+            userStats.longestSession = session.completedTime;
+            userStats.longestSessionDate = session.endTime || new Date();
+        }
+        // Actualizar por tipo de sesión
+        if (session.sessionType === 'focus') {
+            userStats.totalFocusTime += session.completedTime;
+        }
+        else if (session.sessionType === 'short_break') {
+            userStats.totalBreakTime += session.completedTime;
+        }
+        else if (session.sessionType === 'long_break') {
+            userStats.totalLongBreakTime += session.completedTime;
+        }
+        await userStatsRepo.save(userStats);
+        return userStats;
+    }
 }
 exports.StatsService = StatsService;

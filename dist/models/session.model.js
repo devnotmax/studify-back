@@ -64,6 +64,14 @@ __decorate([
     __metadata("design:type", Boolean)
 ], Session.prototype, "isResumed", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ nullable: true, type: "timestamp" }),
+    __metadata("design:type", Object)
+], Session.prototype, "pausedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: 0, type: "int" }),
+    __metadata("design:type", Number)
+], Session.prototype, "elapsedBeforePause", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => user_model_1.User, (user) => user.sessions),
     __metadata("design:type", user_model_1.User)
 ], Session.prototype, "user", void 0);

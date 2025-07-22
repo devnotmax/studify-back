@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatsController = void 0;
 const stats_service_1 = require("../services/stats.service");
+const streak_service_1 = require("../services/streak.service");
 class StatsController {
     static async productivityHours(req, res) {
         try {
@@ -57,8 +58,9 @@ class StatsController {
     static async streak(req, res) {
         try {
             const userId = req.user.id;
-            const data = await stats_service_1.StatsService.getStreak(userId);
-            res.json(data);
+            // Usar la lógica corregida de StreakService
+            const data = await streak_service_1.StreakService.getStreakInfo(userId);
+            res.json({ streak: data });
         }
         catch (error) {
             res.status(500).json({ message: error.message });
